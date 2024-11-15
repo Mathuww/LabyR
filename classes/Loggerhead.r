@@ -53,60 +53,7 @@ Loggerhead <- R6Class("Loggerhead",
     freeDraw = function(moves) {
       if(!self$activeLayer) stop("No layer registered")
       # free draw
-    },
-
-    # Méthode publique
-    # pour visualiser une couche 2D
-    display = function(layerIndex) {
-      layer <- matrix[[layerIndex]]
-
-      pos <- c(0.0, 0.0, 0.0) # Origine du tracé (le 3ème = FILL)
-     
-      turtle_reset()
-      turtle_hide()
-     
-      # Largeur du pinceau (pour tracer un point solitaire)
-      # (comme un ver solitaire)
-      lwd <- turtle_status()$DisplayOptions$lwd 
-     
-      for (i in range(1:length(layer))) {
-        next_vec <- layer[[i]]
-        next_pos <- c(pos[1] + next_vec[1],
-                     pos[2] + next_vec[2],
-                     next_vec[3])
-        # Si ce vecteur a la mention FILL,
-        # on affiche la ligne entre les deux
-        if (next_pos[3]) {
-          turtle_down()
-          turtle_goto(next_pos[1], next_pos[2])
-        } else { 
-          # Sinon on se déplace de manière invisible 
-          # et on affiche simplement le prochain point
-          # sous forme d'une petit carré
-          turtle_up()
-          turtle_goto(next_pos[1], next_pos[2])
-         
-          # Carré côté largeur du pinceau
-          turtle_forward(lwd/2)
-          turtle_left(90)
-         
-          turtle_down()
-          turtle_forward(lwd/2)
-          for (j in 1:3) {
-            turtle_left(90)
-            turtle_forward(lwd)
-          }
-          turtle_left(90)
-          turtle_forward(lwd/2)
-         
-          turtle_up()
-          turtle_left(90)
-          turtle_forward(lwd/2)
-        }
-       
-        # La position suivante devient la position actuelle
-        pos <- next_pos 
-      }
     }
+    
   )
 )
