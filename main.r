@@ -1,10 +1,10 @@
 library(TurtleGraphics)
 
-cheminRelatif <- "C:/Users/mathe/OneDrive/ECOLE/Valrose/L2/progR/LabyR/src/"
+cheminRelatif <- ""
 
 source(paste0(cheminRelatif, 'classes/Loggerhead.r'))
 source(paste0(cheminRelatif, 'classes/Path.r'))
-source(paste0(cheminRelatif, 'classes/Polygon.r'))
+
 
 
 turtle <- Loggerhead$new("Ultimaker_S3") # 0.5 = rayon filament 
@@ -17,14 +17,19 @@ for (i in 1:4) {
   path$turn(90) 
 }
 
-for (i in 1:4) {
-  path$forward(80)
-  path$turn(90) 
-}
 
+source(paste0(cheminRelatif, 'classes/Polygon.r'))
 square <- Polygon$new(path, fill_step = 1)
-
+square$inside(50,0)
+square2 <- Polygon$new(path, origin=c(3,3))
+square$merge(square2)
 # Ajouter un calque contenant le carré
+turtle$addLayer()
+
+turtle$buildShapes(list(
+ square
+))
+
 turtle$addLayer()
 
 turtle$buildShapes(list(

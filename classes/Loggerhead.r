@@ -66,7 +66,7 @@ Loggerhead <- R6Class("Loggerhead",
         if (!inherits(polygon, "Polygon")) {
           stop("All shapes must be of class 'Polygon'")
         } else {
-          polygonPath <- polygon$toPrintPath()
+          polygonPath <- polygon$toPrintPath(self$activeLayer)
           layer <- Path$new()$fusion(layer, polygonPath)
         }
       }

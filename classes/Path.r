@@ -87,7 +87,7 @@ Path <- R6Class("Path",
     # Surcharge de la fonction d'affichage
     print = function() {
       movement_strings <- sapply(self$movements, function(move) {
-        paste0("(", move[1], ", ", move[2], ")")
+        paste0("(", move[1], ", ", move[2], ", ", move[3], ")")
       })
 
       movement_path <- paste(movement_strings, collapse = " -> ")
@@ -98,7 +98,7 @@ Path <- R6Class("Path",
     # Méthode publique pour visualiser un chemin
     display = function() {
       turtle_init()
-      turtle_hide()
+      #turtle_hide()
       turtle_up()
       
       curr_pos <- self$movements[[1]]
@@ -109,13 +109,15 @@ Path <- R6Class("Path",
         # Si ce vecteur a la mention FILL
         if (next_pos[3] != 0) {
           turtle_down()
+          turtle_col(col='black')
           #print(next_pos)
           turtle_goto(next_pos[1], next_pos[2])
         } else { 
           turtle_up()
+          turtle_col(col='red')
           turtle_goto(next_pos[1], next_pos[2])
         }
-
+        Sys.sleep(0.3)
         pos <- next_pos 
       }
     }
