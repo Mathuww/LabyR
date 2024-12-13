@@ -395,7 +395,9 @@ Polygon <- R6Class(
              || f(x + eps, y)
              || (if (x-eps >= 0) f(x - eps, y) else FALSE)
              || f(x, y + eps)
-             || (if (y-eps >= 0) f(x, y - eps) else FALSE))
+             || (if (y-eps >= 0) f(x, y - eps) else FALSE)
+             || (if (y-eps >= 0 && x-eps >= 0) f(x, y - eps) else FALSE)
+             || f(x+eps, y+eps))
 
     },
     
@@ -412,7 +414,7 @@ Polygon <- R6Class(
       
       skeleton <- append(intersections, self$vertices)
       skeleton <- append(skeleton, polygon$vertices)
-      
+      print(skeleton)
       segments <- list()
       n <- length(skeleton)
 
@@ -441,14 +443,20 @@ Polygon <- R6Class(
           # et donc on ne l'inclut pas
           beta1 <- beta(point1, self, polygon)
           beta2 <- beta(point2, self, polygon)
-          print(point1)
-          print(beta1)
-          print(point2)
-          print(beta2)
-          #print(beta2)
           if(beta1 + beta2 == 4) next
           
-
+          if(beta1 + beta2 > 2) {
+            is_in_one_polygon <- FALSE
+            for (s in self$segments) {
+              is_in_one_polygon <- is_in_one_polygon || (identical(list(point1, point2), s))
+              is_in_one_polygon <- is_in_one_polygon || (identical(list(point2, point1), s))
+            }
+            for (s in polygon$segments) {
+              is_in_one_polygon <- is_in_one_polygon || (identical(list(point1, point2), s))
+              is_in_one_polygon <- is_in_one_polygon || (identical(list(point2, point1), s))
+            }
+            if(is_in_one_polygon) next
+          }
           
           is_duplicate <- FALSE
           for (s in segments) {
@@ -459,6 +467,7 @@ Polygon <- R6Class(
           
           if(identical(point1, point2)) next
           
+          #print("KEPT")
           segments <- append(segments, list(c(point1, point2)))
         }
       }
@@ -467,12 +476,19 @@ Polygon <- R6Class(
       
       #segments <- remove_duplicates(segments)
       
-      print(segments)
-      print("NB SEG : ")
-      print(length(segments))
+      #print(segments)
+      #print("NB SEG : ")
+      #print(length(segments))
       
 
-      displaySegments(segments)
+      #displaySegments(segments)
+      
+      s1 <- segments[[1]]
+      new_path <- Path$new(s1[1], s1[2])
+      new_path$make_from_unordered_segments(segments)
+      #print(new_path[[1]])
+      #return(new_path)
+      return(Polygon$new(new_path))
     }
   ),
   

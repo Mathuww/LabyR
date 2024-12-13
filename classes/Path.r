@@ -98,7 +98,7 @@ Path <- R6Class("Path",
     # Méthode publique pour visualiser un chemin
     display = function() {
       turtle_init()
-      #turtle_hide()
+      turtle_hide()
       turtle_up()
       
       curr_pos <- self$movements[[1]]
@@ -117,8 +117,40 @@ Path <- R6Class("Path",
           turtle_col(col='red')
           turtle_goto(next_pos[1], next_pos[2])
         }
-        Sys.sleep(0.3)
+        #Sys.sleep(0.08)
         pos <- next_pos 
+      }
+    },
+    
+    # Tracé d'un path à partir de segment désordonnés
+    make_from_unordered_segments = function(segments) {
+      s1 <- segments[[1]]
+      segments <- segments[-1]
+      end_pt <- c(s1[3], s1[4])
+      self$move(end_pt[1], end_pt[2])
+      
+      while(length(segments) > 0) {
+        #print(length(segments))
+        #print(self)
+        for(j in 1:length(segments)) {
+          s2 <- segments[[j]]
+          #print(s2)
+          if(s2[3] == end_pt[1] && s2[4] == end_pt[2]) {
+            #print("in 34")
+            end_pt <- c(s2[1], s2[2])
+            #self$move(s2[1], s2[2])
+            segments <- segments[-j]
+            break
+          }
+          if(s2[1] == end_pt[1] && s2[2] == end_pt[2]) {
+            #print("in 12")
+            end_pt <- c(s2[3], s2[4])
+            #self$move(s2[3], s2[4])
+            segments <- segments[-j]
+            break
+          }
+        }
+        self$move(end_pt[1], end_pt[2])
       }
     }
   )

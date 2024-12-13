@@ -37,7 +37,7 @@ beta <- function(point, polygon1, polygon2) {
 # Points -> segments
 points_to_segments <- function(points) {
   segments <- lapply(seq_len(length(points) - 1), function(i) {
-    list(c(points[[i]][1], points[[i]][2]), 
+    list(c(points[[i]][1], points[[i]][2]),
       c(points[[i + 1]][1], points[[i + 1]][2]))
   })
   

@@ -62,13 +62,18 @@ Loggerhead <- R6Class("Loggerhead",
       
       layer <- self$layers[[self$activeLayer]]
       
+      merged_polygons <- c()
       for (polygon in polygons) {
         if (!inherits(polygon, "Polygon")) {
           stop("All shapes must be of class 'Polygon'")
         } else {
+          merged
+        }
+      }
+      
+      for (polygon in merged_polygons) {
           polygonPath <- polygon$toPrintPath(self$activeLayer)
           layer <- Path$new()$fusion(layer, polygonPath)
-        }
       }
       
       self$layers[[self$activeLayer]] <- layer
