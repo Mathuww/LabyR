@@ -33,12 +33,18 @@ ___
 * Le ventilateur
 * Quelques commentaires de démarrage
 
+
+<br/>
+
 ## Gestion de fichiers et de sauvegardes
 * ```M21``` -> **monter la carte mémoire** (s'il est mise)
 * ```M22``` -> **démonter la carte mémoire**
 * ```M23 [fichier.gcode]``` -> **sélectionner un fichier donné** de la carte mémoire
 * ```M500``` -> **sauvegarder les paramètres personnalisés actuels dans l'EEPROM**
   * L'avantage de l'EEPROM est que les données seront **non volatile** (concervées même après une coupure de courant) et **modifiable**
+
+
+<br/><br/>
 
 ## Les contrôles générales nécessaires et d'urgences
 * ```M25``` -> **mettre en pause l'impression** depuis la carte sonde
@@ -48,6 +54,7 @@ ___
   ```M300 S@ P@``` -> **déclencher un son** en Hz _(```P@```)_ pendant un temps donné en secondes _(```S@```)_
 
 
+<br/><br/>
 
 ## Les mouvements
 * ```G28 [axes potentielles]``` -> **retour position d'origine** _(home position)_
@@ -73,12 +80,17 @@ ___
   *  ```R@``` => R + accélération utilisée pendant les mouvements de rétractation de filament en mm/s**2
 
 
+<br/><br/>
+
 ## L'interprétation des positions
 * ```G90``` -> mode de positionnement **absolu**
     * _Aide :_ différencier l'absolu et le relatif [ici][source sur les positions]
 * ```G91``` -> mode de positionnement **relative**
 * ```G92 X@ Y@ Z@ E@``` -> définir la position actuelle comme **position par défaut** _(la nouvelle origine)_
     * _Application :_ Réinitialiser à 0 uniquement l'extrudeur
+
+
+<br/><br/>
 
 ## L'extrudeur
 Pour extruder du filament, on doit utiliser le paramètre E@ sur les mouvements quelques conques (de préférence contrôlés). Ce paramètre n'agit que sur l'extrudeur en extrudant une longueur donnée de filament en millimètre.
@@ -110,6 +122,9 @@ Pour extruder du filament, on doit utiliser le paramètre E@ sur les mouvements 
      * faire un Skirt _(entourer la pièce au début de l'impression)_ pour une buse prête en adhérence sur le plateau
      * Naprès une pause/arrêt
 
+
+<br/><br/>
+
 ## La température
 Les _Ultimakers_ préfèrent attendre à chaque fois que la température soit attente par le plateau puis l'extrudeur (il ne fait pas les deux en même temps).
 
@@ -127,6 +142,8 @@ Pour les prochaines commandes,
 * ```M104 S@ R@ T@``` -> définir la température de l’extrudeur **sans attendre**
 * ```M109 S@ R@ T@``` -> définir la température de l’extrudeur et **attendre qu’elle soit atteinte**.
 
+
+<br/><br/>
 
 ## L'étalonnage et le nivellement du plateau _(ajuster la hauteur de l'axe Z)_
 Avant tout, il faut retourner sur la position HOME avec ```G28```,
@@ -153,6 +170,8 @@ Avant tout, il faut retourner sur la position HOME avec ```G28```,
   M500
   ```
 
+<br/><br/>
+
 ## Le ventilateur
 * ```M106 S@ P@ F@``` -> **régler la vitesse** du ventilateur _(en allumant)_
   *  ```S@``` => S + la vitesse du ventilateur de ```0``` à ```255``` _(signal activé en continu soit 100%)_ en unités PWM _(Pulse Width Modulation)_
@@ -160,10 +179,32 @@ Avant tout, il faut retourner sur la position HOME avec ```G28```,
   *  ```F@``` => F + la fréquence PWM _(optionnelle mais efficace pour réduire le bruit)_
 *  ```M107``` -> **désactiver** le ventilateur 
 
+<br/><br/>
 
 ## Quelques commentaires de démarrage
-* ```;PRINT.GROUPS:@t``` -> **gérer plus facilement les groupes d'objets**, une manière de structurer pour les professionnels
-* ```;PRINT.TIME:@t``` -> **définir le temps à l'imprimante** pour avoir un système de minuteur
+
+#### Ceux auquels l'imprimante a besoin pour démarrer
+* **début des commentaires**
+  ```
+  ;START_OF_HEADER
+  ;HEADER_VERSION:@t
+  ```
+* ```;FLAVOR:Griffin``` -> la version spécifique du G-code utilisé _(par exemple, celui de Ultimaker est ```Griffin```)_
+
+<br/>
+
+____________________________
+
+  Dans notre cas, on s'est basé sur la manière de coder du slicer Cura pour déclencher proprement l'impression. 
+  * Pour prévenir l'imprimante, il faut y spécifier **la source et la version du générateur** (ainsi que la date auquel le générateur a généré le fichier) :
+    ```
+    ;GENERATOR.NAME:@t
+    ;GENERATOR.VERSION:@t
+    ;GENERATOR.BUILD_DATE:@t
+    ```
+    * _P'tit problématique :_ le slicer Cura ne met pas à jour la date de l'exportation gcode, car elle correspond à chaque fois à l'installation de la dernière version installée du logiciel
+    * _Application :_ dans notre projet, on utilisera ce commentaire à la date de la génération du gcode
+
 * ```;TARGET_MACHINE.NAME:@t``` -> **définir le nom de l'imprimante** _(marque et modèle)_
 
 * **les paramètres spécialement pour la tête d'impression**
@@ -176,7 +217,6 @@ Avant tout, il faut retourner sur la position HOME avec ```G28```,
 * ```;BUILD_PLATE.INITIAL_TEMPERATURE:@t``` -> **initialisation de la température** de départ du **plateau**
   
 * ```;BUILD_VOLUME.TEMPERATURE:@t``` -> **définir la température ambiante dans l'enceinte de l'imprimante** _(utile dans certaines imprimantes comme Ultimaker ou encore pour certains matériaux)_
-* ```;SLICE_UUID:@t``` -> **d'identifier l'origine exacte du fichier G-code** _(pratique pour reprendre le G-Code dans un slicer comme Cura)_
 
 * **définir les estimations des dimensions de l'impression**
   ```
@@ -188,20 +228,17 @@ Avant tout, il faut retourner sur la position HOME avec ```G28```,
   ;PRINT.SIZE.MAX.Z:@t
   ```
 
-* exemple **début/fin des commentaires** d'un slicer : _Cura_
+* ```;PRINT.TIME:@t``` -> **définir le temps à l'imprimante** pour avoir un système de minuteur
+
+* **fin des commentaires**
   ```
-  ;START_OF_HEADER
-  ;HEADER_VERSION:0.1
-  ;FLAVOR:Griffin
-  ;GENERATOR.NAME:Cura_SteamEngine
-  ;GENERATOR.VERSION:5.8.1
-  ;GENERATOR.BUILD_DATE:2024-08-28
-
-
-  ;Generated with Cura_SteamEngine 5.8.1
+  ;Generated with @[nom_generateur] @[version_generateur] 
   ;END_OF_HEADER
   ```
-
+______________
+#### Les extras bonus
+* ```;PRINT.GROUPS:@t``` -> **gérer plus facilement les groupes d'objets**, une manière de structurer pour les professionnels
+* ```;SLICE_UUID:@t``` -> **d'identifier l'origine exacte du fichier G-code** _(pratique pour reprendre le G-Code dans un slicer comme Cura)_
 
 
 [source de déplacement en ligne droite]: https://www.e-techno-tutos.com/2018/06/10/gcode-g00-g01/ "explication en détails schématique"
