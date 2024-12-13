@@ -124,12 +124,13 @@ Path <- R6Class("Path",
     
     # Tracé d'un path à partir de segment désordonnés
     make_from_unordered_segments = function(segments) {
+      print(segments)
       s1 <- segments[[1]]
       segments <- segments[-1]
       end_pt <- c(s1[3], s1[4])
       self$move(end_pt[1], end_pt[2])
       
-      while(length(segments) > 0) {
+      while(length(segments) > 1) {
         #print(length(segments))
         #print(self)
         for(j in 1:length(segments)) {
@@ -150,6 +151,11 @@ Path <- R6Class("Path",
             break
           }
         }
+        print("ACTUAL POINT")
+        print(c(end_pt[1], end_pt[2]))
+        print("ACTUAL SEGMENTS")
+        print(segments)
+      # print(length(segments))
         self$move(end_pt[1], end_pt[2])
       }
     }

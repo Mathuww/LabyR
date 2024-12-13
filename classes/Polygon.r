@@ -471,8 +471,7 @@ Polygon <- R6Class(
           segments <- append(segments, list(c(point1, point2)))
         }
       }
-      
-      source("poubelle.R")
+      print("OUT")
       
       #segments <- remove_duplicates(segments)
       
@@ -485,10 +484,12 @@ Polygon <- R6Class(
       
       s1 <- segments[[1]]
       new_path <- Path$new(s1[1], s1[2])
-      new_path$make_from_unordered_segments(segments)
+      print("OUT PATH")
+      return(segments)
+      #new_path$make_from_unordered_segments(segments)
       #print(new_path[[1]])
       #return(new_path)
-      return(Polygon$new(new_path))
+      #return(Polygon$new(new_path))
     }
   ),
   

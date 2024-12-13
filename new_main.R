@@ -33,24 +33,38 @@ path2 <- Path$new()
 
 
 # Premier polygone irrégulier (par exemple, 7 côtés)
-draw_irregular_polygon(path1, num_sides = 7, max_length = 80, max_angle = 180)
+#draw_irregular_polygon(path1, num_sides = 7, max_length = 80, max_angle = 180)
+path1$move(10,10)
+path1$move(0,40)
+path1$move(50,50)
+path1$move(50,0)
+path1$move(40,0)
 path1$move(0,0)
 
+
 # Deuxième polygone irrégulier (par exemple, 8 côtés), légèrement déplacé pour superposition
-draw_irregular_polygon(path2, num_sides = 8, max_length = 60, max_angle = 160)
+#draw_irregular_polygon(path2, num_sides = 8, max_length = 60, max_angle = 160)
+path2$move(10,10)
+path2$move(0,40)
+path2$move(50,50)
+path2$move(50,0)
+path2$move(40,0)
 path2$move(0,0)
+
 poly1 <- Polygon$new(path1)
-poly2 <- Polygon$new(path1, origin=c(10,10))
+poly2 <- Polygon$new(path2, origin=c(10,4))
+seg_l <- poly1$merge(poly2)
+#new_poly <- poly1$merge(poly2)
 
-new_poly <- poly1$merge(poly2)
-
-
-
-
+turtle$addLayer()
 turtle$buildShapes(list(
-  new_poly
+  poly1, poly2
 ))
 
 # Afficher le dernier calque
 turtle$display()
 #turtle$genFile()
+
+source("classes/Path.r"); path_t <- Path$new(); path_t$make_from_unordered_segments(seg_l)
+
+path_t$

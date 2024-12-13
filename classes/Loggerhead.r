@@ -67,7 +67,11 @@ Loggerhead <- R6Class("Loggerhead",
         if (!inherits(polygon, "Polygon")) {
           stop("All shapes must be of class 'Polygon'")
         } else {
+<<<<<<< Updated upstream
           #merged
+=======
+         # merged
+>>>>>>> Stashed changes
         }
       }
       
