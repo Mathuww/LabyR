@@ -106,6 +106,8 @@ Loggerhead <- R6Class("Loggerhead",
         gcode_str <- paste(gcode_str, sprintf("\n; LAYER %d\n", i), sep = '')
   
         movs <- self$layers[[i]]$movements
+
+        total_vol <- 0
         
         if (length(movs) > 0) {
           curr_p <- movs[[1]] 
@@ -125,6 +127,7 @@ Loggerhead <- R6Class("Loggerhead",
               #cat('CURR P\n');print(curr_p); cat('NEXT P\n');print(next_p)
               # Volume de fil à extruder 
               extr_v <- self$delta * self$flow_rate * self$nozzle_diam * curr_line_l
+              total_vol <- total_vol + (extr_v/1000)
               # On divise par la surface du filament (qui dépend de son rayon)
               # et on obtient la longueur
               extr_l <- extr_v / (pi * (self$fil_radius)**2)
