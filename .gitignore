@@ -47,10 +47,10 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
-<<<<<<< HEAD
-=======
 .Rprofile
 replit.nix
 .replit
->>>>>>> 6ff7ae0 (initial commit needed)
 examples/*
+
+# MacOS
+.DS_Store
