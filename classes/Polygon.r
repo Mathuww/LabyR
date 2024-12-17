@@ -396,7 +396,7 @@ Polygon <- R6Class(
              || (if (x-eps >= 0) f(x - eps, y) else FALSE)
              || f(x, y + eps)
              || (if (y-eps >= 0) f(x, y - eps) else FALSE)
-             || (if (y-eps >= 0 && x-eps >= 0) f(x, y - eps) else FALSE)
+             || (if (y-eps >= 0 && x-eps >= 0) f(x - eps, y - eps) else FALSE)
              || f(x+eps, y+eps))
 
     },
