@@ -1,16 +1,49 @@
 {
   "Ultimaker_S3":
   {
-    "start_code" : "G21 ; metric pos\nG90 ; absolute pos\nM83 ; relative extr\nM107 ; fan off\nG28 ; homing\nG1 Z5.0 F300 ; 5mm above bed\nM109 S190 ; heat nozzle\nM106 ; fan full speed\nM190 S50 ; heat bed\nG92 E0 ; extr = 0\nG1 F200 E3 ; 3 mm of extr to clean nozzle\nG92 E0 ; reset E axis\n",
-    "end_code" : "M104 S0 ; cool down nozzle\nM140 S0 ; cool down bed\nG91 ; relative pos\nG1 E-1 F300 ; retract extr\nG1 Z0.5 E-5 F300; retract even more while getting 5 mm higher\nG90 ; absolute pos\n\nG28 X0 Y0 ; go home but not in Z\nM107 ; fan off\nM84 ; turn head motors off (to move head freely by hand)\n",
+    "printerName" : "Ultimaker S3",
+    "headerVersion" : "0.1",
+    "flavor" : "Griffin",
+    "generator" :
+    {
+      "name" : "Cura_SteamEngine",
+      "version" : "5.8.1",
+      "dateInstallation" : ""
+    },
+    "extruder" :
+    {
+      "0":
+      {
+        "nameNozzle" : "AA 0.4",
+        "materialGUID" : "44a029e6-e31b-4c9e-a12f-9282e29a92ff",
+        "diameterNozzle" : 0.4,
+        "temperature" : 205
+      }
+    },
+    "temperature_build" : {
+      "plate" : 60,
+      "volume" : 28
+    },
+    "dimensionMax" : {
+      "x" : 230,
+      "y" : 190,
+      "z" : 200
+    },
+    "speed" : {
+      "printing" : 2100,
+      "travel" : 9000,
+      "fan" : 255,
+      "generalAcceleration" : 1500
+    },
+    "fil_diam": 2.85,
+    "start_gcode" : "T0\nG90 ; absolute pos\nM83 ; relative extrusion\nM190 S60 ; heat bed\nM109 S205 T0 ; heat nozzle\nG280 S1 ; convention\nG0 Z20.001\nM106 S255; fan full speed\nM204 S1500 ; acceleration\nM205 X30 Y30 ; start position\n\nG92 E0 ; extr = 0G1 F200 E6 ; 6 mm of extra to compensate end sequence retractionG21 ; metric pos\nG90 ; absolute pos\nM83 ; relative extr\nM107 ; fan off\nG28 ; homing\nG1 Z5.0 F300 ; 5mm above bed\nM109 S190 ; heat nozzle\nM106 ; fan full speed\nM190 S50 ; heat bed\nG92 E0 ; extr = 0\nG1 F200 E3 ; 3 mm of extr to clean nozzle\nG92 E0 ; reset E axis\n",
+    "end_gcode" : "M104 S0 ; cool down nozzle\nM140 S0 ; cool down bed\nG91 ; relative pos\nG1 E-1 F300 ; retract extr\nG1 Z0.5 E-5 F300; retract even more while getting 5 mm higher\nG90 ; absolute pos\n\nG28 X0 Y0 ; go home but not in Z\nM107 ; fan off\nM84 ; turn head motors off (to move head freely by hand)\n",
     "print_speed" : "2100", 
     "travel_speed" : "9000",
     "bed_temp" : "60",
     "nozzle_temp" : "200",
     "nozzle_diam": "0.4",
-    "fil_radius" : "1.425",
-    "max_x" : "230",
-    "max_y" : "190",
-    "max_z" : "200"
+    "fil_radius" : 1.425
+
   }
 }
