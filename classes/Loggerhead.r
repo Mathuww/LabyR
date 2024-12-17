@@ -79,37 +79,6 @@ Loggerhead <- R6Class("Loggerhead",
       comments <- paste0(base, headerVersion, flavor, generator, target, extruder, build, dimensionMin, dimensionMax, endComments)
       return(comments)
     },
-
-    #Méthode publique pour personaliser le gcode
-    commandStart = function ()
-    {
-      nbBuse <- length(self$printer_data$extruder)
-      
-      if (nbBuse == 1) {
-        base <- "T0\n"
-      } else {
-        base <- ""
-      }
-      checkupPosition <- paste0(base, "G90 ; absolute pos\nM83 ; relative extrusion\n")
-      
-      bed <- paste0("M190 S", as.character(self$printer_data$temperature_build$plate)," ; heat bed\n")
-      
-      nozzle <- ""
-      for (i in 1:nbBuse) {
-        numBuse <- as.character(i-1)
-        buse <- self$printer_data$"extruder"[[numBuse]]
-        nozzle <- paste0(nozzle, "M109 S", buse$temperature, " T", numBuse," ; heat nozzle\n")
-      }
-      checkupZ <- "G29 ; leveling\nM420 S1 \nM500 ; mesh leveling\nG0 Z20.001\n"
-      
-      fan <- paste0("M106 S", as.character(self$printer_data$speed$fan)," ; fan full speed\n")
-      generalAcceleration <- paste0("M204 S", as.character(self$printer_data$speed$generalAcceleration)," ; general acceleration\n")
-      
-      checkupFinal <- "\nM205 X30 Y30 ; start position\nG92 E0 ; extr = 0\nG1 F200 E6 ; 6 mm of extra to compensate end sequence retraction\n"
-        
-      command <- paste0(checkupPosition, bed, nozzle, checkupZ, fan, generalAcceleration, checkupFinal)
-      return(command)
-    },
     
     #Méthode publique pour personaliser le gcode
     commandStart = function ()
