@@ -471,25 +471,13 @@ Polygon <- R6Class(
           segments <- append(segments, list(c(point1, point2)))
         }
       }
-      print("OUT")
       
-      #segments <- remove_duplicates(segments)
-      
-      #print(segments)
-      #print("NB SEG : ")
-      #print(length(segments))
-      
-
       #displaySegments(segments)
       
       s1 <- segments[[1]]
       new_path <- Path$new(s1[1], s1[2])
-      print("OUT PATH")
-      return(segments)
-      #new_path$make_from_unordered_segments(segments)
-      #print(new_path[[1]])
-      #return(new_path)
-      #return(Polygon$new(new_path))
+      new_path$make_from_unordered_segments(segments)
+      return(Polygon$new(new_path))
     }
   ),
   
