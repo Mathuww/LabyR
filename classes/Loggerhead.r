@@ -26,10 +26,10 @@ Loggerhead <- R6Class("Loggerhead",
       if (is.null(self$printer_data)) {
         print("WARNING : Data needed to generate GCode start/end sequences for your printer does not exist (check printers.json)")
       } else {
-        self$nozzle_diam = 0.1
-        self$print_speed = as.numeric(self$printer_data$print_speed)
-        self$travel_speed = as.numeric(self$printer_data$travel_speed)
-        self$fil_radius = as.numeric(self$printer_data$fil_radius)
+        self$nozzle_diam = self$printer_data$extruder$diameterNozzle
+        self$print_speed = self$printer_data$speed$printing
+        self$travel_speed = self$printer_data$speed$travel
+        self$fil_radius = (self$printer_data$fil_diam)/2
       }
       
       self$flow_rate <- flow_rate
@@ -37,6 +37,109 @@ Loggerhead <- R6Class("Loggerhead",
       
       turtle_init() # Initialise turtle graphics
       turtle_hide()
+    },
+    
+    #Méthode publique pour personnaliser le début du gcode, spécialement les commentaires pour l'imprimante
+    commentStart = function (volume) {
+      target <- paste0(";TARGET_MACHINE.NAME:", self$printer_data$printerName, "\n")
+      
+      #personalisation des commentaires du début du gcode (toutes les descriptions approfondies sont dans la documentation GCODE.md)
+      base <- ";START_OF_HEADER\n"
+      headerVersion <- paste0(";HEADER_VERSION:", self$printer_data$headerVersion, "\n")
+      flavor <- paste0(";FLAVOR:", self$printer_data$flavor, "\n")
+      
+      #Les commentaires destinés au générateur comme Cura
+      if (self$printer_data$"generator"[["dateInstallation"]] == "") {
+        generator <- paste0(";GENERATOR.NAME:", self$printer_data$generator$name, "\n", ";GENERATOR.VERSION:", self$printer_data$generator$version, "\n", ";GENERATOR.BUILD_DATE:", Sys.Date(), "\n")
+      } else {
+        generator <- paste0(";GENERATOR.NAME:", self$printer_data$generator$name, "\n", ";GENERATOR.VERSION:", self$printer_data$generator$version, "\n", ";GENERATOR.BUILD_DATE:", self$printer_data$"generator"[["dateInstallation"]], "\n")
+      }
+      extruder <- ""
+      nbBuse <- length(self$printer_data$extruder)
+      #Les commmentaires destinés à chaque buse
+      for (i in 1:nbBuse) {
+        numBuse <- as.character(i-1)
+        buse <- self$printer_data$"extruder"[[numBuse]]
+        extruderTemp <- paste0(";EXTRUDER_TRAIN.", numBuse, ".INITIAL_TEMPERATURE:", buse$temperature, "\n")
+        extruderMaterialVolume <- paste0(";EXTRUDER_TRAIN.", numBuse, ".MATERIAL.VOLUME_USED:", volume, "\n")
+        extruderMaterialGUID <- paste0(";EXTRUDER_TRAIN.", numBuse, ".MATERIAL.GUID:", buse$materialGUID, "\n")
+        extruderNozzleDiameter <- paste0(";EXTRUDER_TRAIN.", numBuse, ".NOZZLE.DIAMETER:", as.character(buse$diameterNozzle), "\n")
+        extruderNozzleName <- paste0(";EXTRUDER_TRAIN.", numBuse, ".NOZZLE.NAME:", as.character(buse$nameNozzle), "\n")
+        extruder <- paste0(extruder, extruderTemp, extruderMaterialVolume, extruderMaterialGUID, extruderNozzleDiameter,extruderNozzleName)
+      }
+       #Les commentaires destinés aux différentes température extérieur et du plateau
+      build <- paste0(";BUILD_PLATE.INITIAL_TEMPERATURE:", as.character(self$printer_data$temperature_build$plate), "\n", ";BUILD_VOLUME.TEMPERATURE:", as.character(self$printer_data$temperature_build$volume) ,"\n")
+      
+      #Les commentaires destinés au dimension de l'impression, qui est pour l'instant la dimension de l'imprimante
+      dimensionMin <- paste0(";PRINT.SIZE.MIN.X:", "0", "\n", ";PRINT.SIZE.MIN.Y:", "0", "\n", ";PRINT.SIZE.MIN.Z:", "0", "\n" )
+      dimensionMax <- paste0(";PRINT.SIZE.MAX.X:", as.character(self$printer_data$dimensionMax$x), "\n", ";PRINT.SIZE.MAX.Y:", as.character(self$printer_data$dimensionMax$y), "\n", ";PRINT.SIZE.MAX.Z:", as.character(self$printer_data$dimensionMax$z), "\n" )
+      
+      endComments <- paste0(";END_OF_HEADER\n;Generated with ", self$printer_data$generator$name, " ", self$printer_data$generator$version, "\n")
+      
+      comments <- paste0(base, headerVersion, flavor, generator, target, extruder, build, dimensionMin, dimensionMax, endComments)
+      return(comments)
+    },
+
+    #Méthode publique pour personaliser le gcode
+    commandStart = function ()
+    {
+      nbBuse <- length(self$printer_data$extruder)
+      
+      if (nbBuse == 1) {
+        base <- "T0\n"
+      } else {
+        base <- ""
+      }
+      checkupPosition <- paste0(base, "G90 ; absolute pos\nM83 ; relative extrusion\n")
+      
+      bed <- paste0("M190 S", as.character(self$printer_data$temperature_build$plate)," ; heat bed\n")
+      
+      nozzle <- ""
+      for (i in 1:nbBuse) {
+        numBuse <- as.character(i-1)
+        buse <- self$printer_data$"extruder"[[numBuse]]
+        nozzle <- paste0(nozzle, "M109 S", buse$temperature, " T", numBuse," ; heat nozzle\n")
+      }
+      checkupZ <- "G29 ; leveling\nM420 S1 \nM500 ; mesh leveling\nG0 Z20.001\n"
+      
+      fan <- paste0("M106 S", as.character(self$printer_data$speed$fan)," ; fan full speed\n")
+      generalAcceleration <- paste0("M204 S", as.character(self$printer_data$speed$generalAcceleration)," ; general acceleration\n")
+      
+      checkupFinal <- "\nM205 X30 Y30 ; start position\nG92 E0 ; extr = 0\nG1 F200 E6 ; 6 mm of extra to compensate end sequence retraction\n"
+        
+      command <- paste0(checkupPosition, bed, nozzle, checkupZ, fan, generalAcceleration, checkupFinal)
+      return(command)
+    },
+    
+    #Méthode publique pour personaliser le gcode
+    commandStart = function ()
+    {
+      nbBuse <- length(self$printer_data$extruder)
+      
+      if (nbBuse == 1) {
+        base <- "T0\n"
+      } else {
+        base <- ""
+      }
+      checkupPosition <- paste0(base, "G90 ; absolute pos\nM83 ; relative extrusion\n")
+      
+      bed <- paste0("M190 S", as.character(self$printer_data$temperature_build$plate)," ; heat bed\n")
+      
+      nozzle <- ""
+      for (i in 1:nbBuse) {
+        numBuse <- as.character(i-1)
+        buse <- self$printer_data$"extruder"[[numBuse]]
+        nozzle <- paste0(nozzle, "M109 S", buse$temperature, " T", numBuse," ; heat nozzle\n")
+      }
+      checkupZ <- "G29 ; leveling\nM420 S1 \nM500 ; mesh leveling\nG0 Z20.001\n"
+      
+      fan <- paste0("M106 S", as.character(self$printer_data$speed$fan)," ; fan full speed\n")
+      generalAcceleration <- paste0("M204 S", as.character(self$printer_data$speed$generalAcceleration)," ; general acceleration\n")
+      
+      checkupFinal <- "\nM205 X30 Y30 ; start position\nG92 E0 ; extr = 0\nG1 F200 E6 ; 6 mm of extra to compensate end sequence retraction\n"
+        
+      command <- paste0(checkupPosition, bed, nozzle, checkupZ, fan, generalAcceleration, checkupFinal)
+      return(command)
     },
 
     # Méthode publique pour ajouter un nouveau calque
@@ -95,7 +198,7 @@ Loggerhead <- R6Class("Loggerhead",
     # Pour générer le GCode correspondant à toutes les couches
     genFile = function(filename = paste0(cheminRelatif, "out.gcode")) {
       # En-tête spécifique à l'imprimante
-      gcode_str <- paste("; START SEQUENCE (in printers.json)\n", self$printer_data$start_code, sep='')
+      gcode_str <- paste("; START SEQUENCE (in printers.json)\n", self$commentStart(5), "\n", self$commandStart(), sep='')
 
       for (i in 1:length(self$layers)) {
         # Coordonnée Z absolue (i-1 fois la hauteur d'une couche, 
@@ -143,7 +246,7 @@ Loggerhead <- R6Class("Loggerhead",
       }
       # Code de fin spécifique à l'imprimante
       gcode_str <- paste(gcode_str, "\n\n; END SEQUENCE\n", sep='')
-      gcode_str <- paste(gcode_str, self$printer_data$end_code, sep='')
+      gcode_str <- paste(gcode_str, self$printer_data$end_gcode, sep='')
       write(gcode_str, filename)
     }
     
