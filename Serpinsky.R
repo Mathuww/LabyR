@@ -80,7 +80,8 @@ Serpinsky <- function(n, len) {
 
 serp_path <- Serpinsky(3, 10)
 
-turtle <- Loggerhead$new("Ultimaker S3")
+turtle <- Loggerhead$new("Ultimaker_S3")
 turtle$addLayer()
 turtle$freeDraw(serp_path)
 turtle$display()
+turtle$genFile()
